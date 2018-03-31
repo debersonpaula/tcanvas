@@ -39,24 +39,6 @@ export class TileCanvas {
 			tileset.image.src = url;
 			this._tiles[tilename] = tileset;
 		});
-
-		// let imgLoaded = false;
-
-		// tileset.image.onload = () => {
-		// 	imgLoaded = true;
-		// }
-		// tileset.image.onerror = () => {
-		// 	imgLoaded = true;
-		// }
-		// while(1)
-		// 	if (imgLoaded)
-		// 		break;
-
-		// const timeOut = 5*1000; //ms - waiting for max 5s to laoad
-		// const start = new Date().getTime();
-		// while(1)
-		// 	if(tileset.image.complete || tileset.image.naturalWidth || new Date().getTime()-start>timeOut)
-		// 		break;
 	}
 
 	/** draw map */
@@ -64,21 +46,18 @@ export class TileCanvas {
 		const tileset = this._tiles[tilename];
 		if (tileset) {
 			const {image, tileCount, tileSize} = tileset;
-			// image.onload = () => {
-				const layerRows = tilemap.length;
-				const layerCols = tilemap.length > 0 ? tilemap[0].length : 0;
-				for (var r = 0; r < layerRows; r++) {
-					for (var c = 0; c < layerCols; c++) {
-						var tile = tilemap[ r ][ c ];
-						var tileRow = (tile / tileCount) | 0;
-						var tileCol = (tile % tileCount) | 0;
-						if (this._context != null) {
-							this._context.drawImage(image, (tileCol * tileSize), (tileRow * tileSize), tileSize, tileSize, (c * tileSize), (r * tileSize), tileSize, tileSize);
-						}
+			const layerRows = tilemap.length;
+			const layerCols = tilemap.length > 0 ? tilemap[0].length : 0;
+			for (var r = 0; r < layerRows; r++) {
+				for (var c = 0; c < layerCols; c++) {
+					var tile = tilemap[ r ][ c ];
+					var tileRow = (tile / tileCount) | 0;
+					var tileCol = (tile % tileCount) | 0;
+					if (this._context != null) {
+						this._context.drawImage(image, (tileCol * tileSize), (tileRow * tileSize), tileSize, tileSize, (c * tileSize), (r * tileSize), tileSize, tileSize);
 					}
 				}
-				// callback && callback();
-			// }
+			}
 		}
 	}
 
