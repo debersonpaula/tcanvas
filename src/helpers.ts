@@ -1,5 +1,5 @@
-export function loadImage(url: string): Promise<any> {
-	return new Promise<any>((resolve: any, reject: any) => {
+export function loadImage(url: string): Promise<HTMLImageElement> {
+	return new Promise<HTMLImageElement>((resolve: any, reject: any) => {
 		try {
 			var img = new Image();
 			img.src = url;

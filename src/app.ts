@@ -29,4 +29,4 @@
 // 	});
 // }
 
-import ('./test3');
+import ('./test1');

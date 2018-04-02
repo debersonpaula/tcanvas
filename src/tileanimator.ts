@@ -1,12 +1,11 @@
 import {TileSet} from './tileset';
 
 export class TileAnimator extends TileSet {
-	protected _actions: TActions;
+	protected _actions: TActions = {};
 
 	/** Create TileAnimator */
-	constructor(url: string, tileWidth: number, tileHeight: number, rows: number, cols: number) {
-		super(url, tileWidth, tileHeight, rows, cols);
-		this._actions = {};
+	constructor(image: HTMLImageElement, tileWidth: number, tileHeight: number, rows: number, cols: number) {
+		super(image, tileWidth, tileHeight, rows, cols);
 	}
 
 	/** Add Sequence of Frames */

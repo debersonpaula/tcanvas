@@ -1,37 +1,27 @@
 import * as helpers from './helpers';
 
 export class TileSet {
-	// protected _img: HTMLImageElement | undefined;
-	protected _imgPromise: Promise<HTMLImageElement>;
 	protected _tiles: HTMLCanvasElement[];
-
-	constructor(url: string, tileWidth: number, tileHeight: number, rows: number, cols: number) {
-		// initializes tiles
+	public tileWidth: number = 0;
+	public tileHeight: number = 0;
+	/** Create TileSet */
+	constructor(image: HTMLImageElement, tileWidth: number, tileHeight: number, rows: number, cols: number) {
 		this._tiles = [];
-		// load image
-		this._imgPromise = helpers.loadImage(url);
-		this._imgPromise.then(value => {
-			// assign image element
-			const img: HTMLImageElement = value;
-			// crop tiles
-			for (let r = 0; r < rows; r++) {
-			 	for (let c = 0; c < cols; c++) {
-					this._tiles.push(
-						cropImageToCanvas(img, c * tileWidth, r * tileHeight, tileWidth, tileHeight)
-					);
-			 	}
+		this.tileHeight = tileHeight;
+		this.tileWidth = tileWidth;
+		for (let r = 0; r < rows; r++) {
+			for (let c = 0; c < cols; c++) {
+				this._tiles.push(
+					cropImageToCanvas(image, c * tileWidth, r * tileHeight, tileWidth, tileHeight)
+				);
 			}
-		});
+		}
 	}
-
-	get imgLoad() {
-		return this._imgPromise;
-	}
-
+	/** Get Tile by index number */
 	tile(index: number): HTMLCanvasElement {
 		return this._tiles[index];
 	}
-
+	/** Count of tiles */
 	get count() {
 		return this._tiles.length;
 	}
