@@ -1,8 +1,10 @@
 import {TileSet} from './tileset';
 
-type TileLayer = {
+export type TileLayer = {
 	canvas: HTMLCanvasElement;
-	context: CanvasRenderingContext2D | null;
+	context: CanvasRenderingContext2D;
+	tileset: TileSet;
+	onRedraw?: (layer: TileLayer) => void;
 };
 
 export class TileCanvas {
@@ -23,8 +25,8 @@ export class TileCanvas {
 	set height(value: number) {
 		this._canvas.height = value;
 	}
-	/** Add Layer as Map */
-	addLayerMap(tilename: string, tilemap: number[][]) {
+	/** Add Layer */
+	addLayer(tilename: string): TileLayer | undefined {
 		const tileset = this._tilesets[tilename];
 		if (tileset) {
 			const canvas = document.createElement('canvas');
@@ -32,10 +34,24 @@ export class TileCanvas {
 			canvas.height = this._canvas.height;
 			const context = canvas.getContext('2d');
 			if (context) {
-				for (let i = 0; i < tilemap.length; i++) {
-					for (let j = 0; j < tilemap[i].length; j++) {
-						context.drawImage(tileset.tile(tilemap[i][j]), i * tileset.tileWidth, j * tileset.tileHeight);
-					}
+				const layer: TileLayer = {canvas, context, tileset};
+				this._layers.push(layer);
+				return layer;
+			}
+		}
+		return undefined;
+	}
+	/** Add Layer as Map */
+	addLayerMap(tilename: string, tilemap: number[][]) {
+		const layer = this.addLayer(tilename);
+		if (layer) {
+			for (let r = 0; r < tilemap.length; r++) {
+				for (let c = 0; c < tilemap[r].length; c++) {
+					layer.context.drawImage(
+						layer.tileset.tile(tilemap[r][c]),
+						c * layer.tileset.tileWidth,
+						r * layer.tileset.tileHeight
+					);
 				}
 			}
 		}
@@ -45,48 +61,15 @@ export class TileCanvas {
 		this._tilesets[tilename] = tileset;
 	}
 
-	// get onLoad(): Promise<any> {
-	// 	return Promise.all(this._imgLoad);
-	// }
-
-	/** add image to tileset */
-	// addTile(tilename: string, url: string, tileSize: number, tileCount: number) {
-	// 	const img = loadImage(url);
-	// 	this._imgLoad.push(img);
-	// 	img.then(image => {
-	// 		const tileset: TileSet = {
-	// 			image,
-	// 			tileSize,
-	// 			tileCount
-	// 		};
-	// 		tileset.image.src = url;
-	// 		this._tiles[tilename] = tileset;
-	// 	});
-	// }
-
-	/** draw map */
-	// drawMap(tilename: string, tilemap: number[][], callback?: Function) {
-	// 	const tileset = this._tiles[tilename];
-	// 	if (tileset) {
-	// 		const {image, tileCount, tileSize} = tileset;
-	// 		const layerRows = tilemap.length;
-	// 		const layerCols = tilemap.length > 0 ? tilemap[0].length : 0;
-	// 		for (var r = 0; r < layerRows; r++) {
-	// 			for (var c = 0; c < layerCols; c++) {
-	// 				var tile = tilemap[ r ][ c ];
-	// 				var tileRow = (tile / tileCount) | 0;
-	// 				var tileCol = (tile % tileCount) | 0;
-	// 				if (this._context != null) {
-	// 					this._context.drawImage(image, (tileCol * tileSize), (tileRow * tileSize), tileSize, tileSize, (c * tileSize), (r * tileSize), tileSize, tileSize);
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	draw() {
-		for (const i in this._layers) {
-			
+	/** Repaint the canvas with latest layers */
+	redraw() {
+		if (this._context) {
+			this._context.clearRect(0,0, this._canvas.width, this._canvas.height);
+			for (const i in this._layers) {
+				const layer = this._layers[i];
+				layer.onRedraw && layer.onRedraw(layer);
+				this._context.drawImage(layer.canvas,0,0);
+			}
 		}
 	}
 
@@ -97,28 +80,9 @@ export class TileCanvas {
 			context.drawImage(this._canvas, 0, 0);
 		}
 	}
+
+	/** Get TileSet By Name */
+	tileset(tilename: string): TileSet {
+		return this._tilesets[tilename];
+	}
 }
-
-// type TileSets = {[key: string]: TileSet};
-// type TileSet = {
-// 	image: HTMLImageElement;
-// 	tileSize: number;
-// 	tileCount: number;
-// }
-
-// function loadImage(url: string): Promise<any> {
-// 	return new Promise<any>((resolve: any, reject: any) => {
-// 		try {
-// 			var img = new Image();
-// 			img.src = url;
-// 			img.onload = () => {
-// 				resolve(img);
-// 			};
-// 			img.onerror = (err) => {
-// 				reject(err);
-// 			};
-// 		} catch (e) {
-// 			reject(e);
-// 		}
-// 	});
-// }

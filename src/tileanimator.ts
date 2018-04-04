@@ -1,24 +1,20 @@
-import {TileSet} from './tileset';
+import {TileCanvas, TileLayer} from './tilecanvas';
+import {TileActor} from './tileactor';
+import {TilePosition} from './types';
 
-export class TileAnimator extends TileSet {
-	protected _actions: TActions = {};
+export class TileAnimator extends TileCanvas {
+	/** duration of each frame (ms)
+	 * by default, is set to 100ms (10 fps)
+	*/
+	public duration: number = 100;
 
-	/** Create TileAnimator */
-	constructor(image: HTMLImageElement, tileWidth: number, tileHeight: number, rows: number, cols: number) {
-		super(image, tileWidth, tileHeight, rows, cols);
+	/** Add Layer as Map */
+	addLayerActor(actor: TileActor, initialPosition: TilePosition) {
+		const layer = this.addLayer(actor.tilename);
+		if (layer) {
+			layer.onRedraw = actor.onRedraw.bind(actor);
+			actor.position = initialPosition;
+		}
 	}
 
-	/** Add Sequence of Frames */
-	addAction(name: string, duration: number, frames: number[]) {
-		this._actions[name] = {duration, frames};
-	}
 }
-
-type TAction = {
-	/** Sequence of tiles to be a frameset */
-	frames: number[];
-	/** Duration of entire sequence in ms */
-	duration: number;
-};
-
-type TActions = {[action: string]: TAction};
